@@ -1,0 +1,112 @@
+{% extends "layout/base.html" %}
+
+{% block title %}Preview Faktur Lengkap - {{ db }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .table-responsive-full { 
+        max-height: 70vh; 
+        overflow: auto; 
+        background: white;
+        border-radius: 8px;
+    }
+    thead { position: sticky; top: 0; z-index: 10; }
+    .table { font-size: 0.85rem; }
+    th, td { white-space: nowrap; vertical-align: middle; }
+    .col-desc { min-width: 250px; white-space: normal; }
+    /* Warna khusus untuk header faktur agar beda dengan SO */
+    .bg-faktur { background-color: #dc3545; color: white; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-faktur d-flex justify-content-between align-items-center">
+            <h5 class="mb-0"><i class="bi bi-file-earmark-text"></i> Preview Faktur - Database: {{ db }}</h5>
+            <div class="btn-group">
+                <button onclick="downloadSelected()" class="btn btn-light btn-sm fw-bold">
+                    <i class="bi bi-download"></i> Download Terpilih
+                </button>
+                <a href="{{ url_for('dashboard.index') }}" class="btn btn-outline-light btn-sm ms-2">Kembali</a>
+            </div>
+        </div>
+
+        <div class="card-body bg-light border-bottom">
+            <div class="row g-2">
+                <div class="col-md-4">
+                    <input type="text" id="searchGeneral" onkeyup="filterData()" class="form-control form-control-sm" placeholder="Cari No. SJ, Invoice, atau Customer...">
+                </div>
+                <div class="col-md-3">
+                    <input type="date" id="dateStart" onchange="filterData()" class="form-control form-control-sm">
+                </div>
+                <div class="col-md-3">
+                    <input type="date" id="dateEnd" onchange="filterData()" class="form-control form-control-sm">
+                </div>
+            </div>
+        </div>
+        
+        <div class="card-body p-0">
+            <div class="table-responsive-full">
+                <table class="table table-sm table-bordered table-hover mb-0" id="fakturTable">
+                    <thead class="table-dark">
+                        <tr>
+                            <th class="text-center"><input type="checkbox" onclick="toggleAll(this)" class="form-check-input"></th>
+                            <th>Tgl Faktur</th>
+                            <th>No. Inv</th>
+                            <th>No. SJ</th>
+                            <th>Nama Customer</th>
+                            <th>Kode Barang</th>
+                            <th>Deskripsi Item</th>
+                            <th>Kts</th>
+                            <th>Satuan</th>
+                            <th>Harga Satuan</th>
+                            <th>DPP</th>
+                            <th>PPN</th>
+                            <th>Disk%</th>
+                            <th>Total Faktur</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in data %}
+                        <tr>
+                            <td class="text-center"><input type="checkbox" class="row-check form-check-input"></td>
+                            <td class="cell-tanggal">{{ row['Tgl Faktur'] }}</td>
+                            <td>{{ row['No. Inv'] }}</td>
+                            <td>{{ row['No. SJ'] }}</td>
+                            <td>{{ row['Nama Customer'] }}</td>
+                            <td>{{ row['Kode Barang'] }}</td>
+                            <td class="col-desc">{{ row['Deskripsi Item'] }}</td>
+                            <td class="text-end">{{ row['Kts'] }}</td>
+                            <td class="text-center">{{ row['Satuan'] }}</td>
+                            <td class="text-end">{{ row['Harga Satuan'] }}</td>
+                            <td class="text-end">{{ row['DPP'] }}</td>
+                            <td class="text-end">{{ row['PPN'] }}</td>
+                            <td class="text-center">{{ row['Disk%'] }}</td>
+                            <td class="text-end fw-bold">{{ row['Total Faktur'] }}</td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="14" class="text-center py-4 text-muted">Data Faktur tidak ditemukan.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<form id="downloadForm" action="{{ url_for('documents.download_faktur') }}" method="POST" style="display:none;">
+    <input type="hidden" name="db" value="{{ db }}">
+    <input type="hidden" name="selected_rows" id="selectedRowsInput">
+</form>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Konfigurasi untuk documents.js
+    const CURRENT_DB = "{{ db }}";
+</script>
+<script src="{{ url_for('static', filename='js/documents.js') }}"></script>
+{% endblock %}

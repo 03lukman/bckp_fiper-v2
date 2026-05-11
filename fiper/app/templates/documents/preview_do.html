@@ -1,0 +1,178 @@
+{% extends "layout/base.html" %}
+
+{% block title %}Preview DO Pengiriman - {{ db }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/print_do.css') }}">
+
+<style>
+    /* --- 1. TAMPILAN KHUSUS MONITOR --- */
+    .table-responsive { 
+        max-height: 65vh; 
+        overflow: auto; 
+        background: white; 
+        border-radius: 8px; 
+        position: relative; 
+    }
+
+    #doTable thead th {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        background-color: #212529 !important; /* Monitor tetap elegan dengan Dark Mode */
+        color: white;
+        box-shadow: none !important; 
+        border: none !important;
+        outline: none !important;
+    }
+
+    #doTable thead { border: none !important; }
+
+    /* Lebar Kolom di Monitor (Pixel-Based) */
+    .w-qty     { width: 70px; text-align: right; } /* QTY RATA KANAN DI MONITOR */
+    .w-packing { width: 140px; }
+    .w-kode    { width: 110px; text-align: center; }
+    .w-nama    { min-width: 350px; }
+    .w-so      { width: 130px; text-align: center; }
+    .w-cust    { width: 180px; }
+    .w-sj      { width: 160px; text-align: center; }
+
+    #doTable th, #doTable td { 
+        font-size: 13px; 
+        vertical-align: middle; 
+    }
+    
+    /* Sembunyikan Header Surat Jalan di Monitor */
+    .print-header-info { display: none; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid p-0">
+    <div class="d-flex justify-content-between align-items-center mb-3 no-print">
+        <h3 class="fw-bold m-0">Dashboard DO - {{ db }}</h3>
+        <div class="btn-group shadow-sm">
+            <button onclick="downloadSelected()" class="btn btn-success btn-sm"><i class="bi bi-file-earmark-excel"></i> Download Excel</button>
+            <button onclick="printSelected()" class="btn btn-primary btn-sm"><i class="bi bi-printer"></i> Print DO (A5)</button>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0 p-3 mb-3 no-print">
+        <div class="row g-3">
+            <div class="col-md-2">
+                <label class="form-label fw-bold small text-muted">DRIVER</label>
+                <input type="text" id="inputDriver" class="form-control form-control-sm border-primary" placeholder="Nama Driver...">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label fw-bold small text-muted">LOKASI</label>
+                <input type="text" id="inputDept" class="form-control form-control-sm border-primary" placeholder="Lokasi Pabrik...">
+            </div>
+            <div class="col-md-8">
+                <label class="form-label fw-bold small text-muted">SEARCH</label>
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+                    <input type="text" id="searchGeneral" onkeyup="filterData()" class="form-control" placeholder="Cari data...">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="print-header-info text-center">
+        <h4 class="fw-bold mb-3">DELIVERY ORDER (DO)</h4>
+        <table style="width: 100%; border: none !important; margin-bottom: 5px;">
+            <tr style="border: none !important;">
+                <td style="border: none !important; width: 12%; font-weight: bold; text-align: left;">Driver</td>
+                <td style="border: none !important; width: 2%;">:</td>
+                <td style="border: none !important; width: 36%; text-align: left;"><span id="displayDriver"></span></td>
+                <td style="border: none !important; width: 12%; font-weight: bold; text-align: left;">Tanggal</td>
+                <td style="border: none !important; width: 2%;">:</td>
+                <td style="border: none !important; text-align: left;">{{ now }}</td>
+            </tr>
+            <tr style="border: none !important;">
+                <td style="border: none !important; font-weight: bold; text-align: left;">Lokasi</td>
+                <td style="border: none !important;">:</td>
+                <td style="border: none !important; text-align: left;"><span id="displayDept"></span></td>
+                <td style="border: none !important; font-weight: bold; text-align: left;">Database</td>
+                <td style="border: none !important;">:</td>
+                <td style="border: none !important; text-align: left;">{{ db }}</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="table-responsive shadow-sm border">
+        <table class="table table-bordered table-sm table-hover mb-0" id="doTable">
+            <thead class="table-dark">
+                <tr>
+                    <th class="no-print text-center" style="width: 30px;">
+                        <input type="checkbox" onclick="toggleAll(this)" class="form-check-input">
+                    </th>
+                    <th class="w-qty text-center">QTY</th>
+                    <th class="w-packing">Packing</th>
+                    <th class="w-kode text-center">Kode</th>
+                    <th class="w-nama">Nama Barang</th>
+                    <th class="w-so text-center">No. SO</th>
+                    <th class="w-cust">Customer</th>
+                    <th class="w-sj text-center">No. SJ</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in data %}
+                <tr>
+                    <td class="no-print text-center align-middle">
+                        <input type="checkbox" class="row-check form-check-input">
+                    </td>
+                    <td class="text-number fw-bold pe-2 align-middle w-qty">{{ row.QTY }}</td>
+                    <td class="align-middle w-packing">{{ row.PACKING }}</td>
+                    <td class="align-middle w-kode text-center">{{ row.KODE_BARANG }}</td>
+                    <td class="align-middle w-nama">
+                        <div class="text-wrap-pabrik">{{ row.NAMA_BARANG }}</div>
+                    </td>
+                    <td class="fw-bold text-primary align-middle w-so text-center">{{ row.NO_SO }}</td>
+                    <td class="align-middle w-cust">{{ row.NAMA_CUSTOMER }}</td>
+                    <td class="align-middle fw-bold w-sj text-center">{{ row.NO_SJ }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<form id="downloadForm" action="{{ url_for('documents.download_do') }}" method="POST" style="display:none;">
+    <input type="hidden" name="db" value="{{ db }}">
+    <input type="hidden" name="selected_rows" id="selectedRowsInput">
+</form>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/documents.js') }}"></script>
+<script>
+    function printSelected() {
+        document.getElementById("displayDriver").innerText = document.getElementById("inputDriver").value || "-";
+        document.getElementById("displayDept").innerText = document.getElementById("inputDept").value || "-";
+
+        const rows = document.querySelectorAll("#doTable tbody tr");
+        let hasSelection = false;
+
+        rows.forEach(row => {
+            const checkbox = row.querySelector(".row-check");
+            if (checkbox && !checkbox.checked) {
+                row.classList.add("hide-row-print");
+            } else if (checkbox && checkbox.checked) {
+                hasSelection = true;
+                row.classList.remove("hide-row-print");
+            }
+        });
+
+        if (!hasSelection) {
+            alert("Pilih minimal satu baris untuk dicetak!");
+            return;
+        }
+
+        window.print();
+        
+        setTimeout(() => {
+            rows.forEach(row => row.classList.remove("hide-row-print"));
+        }, 500);
+    }
+</script>
+{% endblock %}

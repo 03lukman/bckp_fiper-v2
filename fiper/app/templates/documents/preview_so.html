@@ -1,0 +1,154 @@
+{% extends "layout/base.html" %}
+
+{% block title %}Preview Register SO - {{ db }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* --- TAMPILAN MONITOR --- */
+    .table-container { 
+        max-height: 70vh; 
+        overflow: auto; 
+        background: white; 
+        border-radius: 8px; 
+        position: relative; 
+    }
+
+    /* KUNCI: Membuat Header Tetap (Sticky) */
+    #soTable thead th {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        background-color: #212529 !important; /* Warna table-dark */
+        color: white;
+        box-shadow: inset 0 -1px 0 #dee2e6;
+    }
+
+    #soTable th, #soTable td { 
+        font-size: 13px; 
+        vertical-align: middle; 
+    }
+
+    .btn-wa { background-color: #25d366; color: white; }
+    .btn-wa:hover { background-color: #128c7e; color: white; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold">Register SO - Database: {{ db }}</h2>
+        <div class="btn-group shadow-sm">
+            <button onclick="downloadSelected()" class="btn btn-success">
+                <i class="bi bi-file-earmark-excel"></i> Download
+            </button>
+            <button onclick="openEmailModal()" class="btn btn-primary">
+                <i class="bi bi-envelope"></i> Email
+            </button>
+            <button onclick="sendWhatsApp('{{ db }}')" class="btn btn-wa">
+                <i class="bi bi-whatsapp"></i> WhatsApp
+            </button>
+            <a href="{{ url_for('dashboard.index') }}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Kembali
+            </a>
+        </div>
+    </div>
+
+    <div class="row mb-3 card p-3 shadow-sm mx-0 border-0">
+        <div class="row g-2">
+            <div class="col-md-3">
+                <label class="small fw-bold">Cari Data:</label>
+                <input type="text" id="searchGeneral" onkeyup="filterData()" class="form-control form-control-sm" placeholder="Cari Nama/Barang...">
+            </div>
+            <div class="col-md-3">
+                <label class="small fw-bold">Dari Tanggal:</label>
+                <input type="date" id="dateStart" onchange="filterData()" class="form-control form-control-sm">
+            </div>
+            <div class="col-md-3">
+                <label class="small fw-bold">Sampai Tanggal:</label>
+                <input type="date" id="dateEnd" onchange="filterData()" class="form-control form-control-sm">
+            </div>
+        </div>
+    </div>
+
+    <div class="table-container shadow-sm border">
+        <table class="table table-bordered table-sm table-hover mb-0" id="soTable">
+            <thead class="table-dark">
+                <tr>
+                    <th class="text-center" style="width: 40px;">
+                        <input type="checkbox" onclick="toggleAll(this)" class="form-check-input">
+                    </th>
+                    <th style="width: 100px;">No. SO</th>
+                    <th style="width: 100px;">Tgl SO</th>
+                    <th style="width: 120px;">Kode Barang</th>
+                    <th>Nama Barang</th>
+                    <th style="width: 150px;">Packing</th>
+                    <th class="text-end" style="width: 80px;">Qty</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in data %}
+                <tr>
+                    <td class="text-center align-middle">
+                        <input type="checkbox" class="row-check form-check-input">
+                    </td>
+                    <td class="cell-so-no align-middle fw-bold text-primary">{{ row.NO_SO }}</td>
+                    <td class="cell-tanggal align-middle">{{ row.TANGGAL_SO }}</td>
+                    <td class="cell-kode align-middle">{{ row.KODE_BARANG }}</td>
+                    
+                    <td class="cell-nama align-middle" style="min-width: 350px;">
+                        <div class="text-wrap-pabrik">
+                            {{ row.NAMA_BARANG }}
+                        </div>
+                    </td>
+                    
+                    <td class="cell-packing align-middle">{{ row.PACKING }}</td>
+                    <td class="cell-qty text-number align-middle pe-2">{{ row.QTY }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="7" class="text-center py-4 text-muted">Tidak ada data ditemukan.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="modal fade" id="emailModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">Kirim Laporan via Email</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">Email Penerima / Group:</label>
+                    <input type="text" id="modalEmail" class="form-control" placeholder="pabrik / office / email@contoh.com">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Catatan Tambahan:</label>
+                    <textarea id="modalNote" class="form-control" rows="3"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                <button type="button" id="btnSendEmail" onclick="processSendEmail()" class="btn btn-primary">Kirim Sekarang</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<form id="downloadForm" action="{{ url_for('documents.download_so') }}" method="POST" style="display:none;">
+    <input type="hidden" name="db" value="{{ db }}">
+    <input type="hidden" name="selected_rows" id="selectedRowsInput">
+</form>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const URL_SEND_EMAIL = "{{ url_for('documents.send_email_so') }}";
+    const CURRENT_DB = "{{ db }}";
+</script>
+<script src="{{ url_for('static', filename='js/documents.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,144 @@
+/* FIPER v2 - Enterprise Dashboard System
+   Standardization: Modern Clean UI & Robust Table Layout
+*/
+
+:root {
+    --sidebar-width: 250px;
+    --sidebar-collapsed-width: 70px;
+    --sidebar-transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    --dark-bg: #1a1d21;
+    --light-bg: #f4f7f6;
+    --primary-blue: #0d6efd;
+}
+
+#main-wrapper {
+    height: 100vh;
+    display: flex;
+    width: 100%;
+}
+
+/* --- SIDEBAR BASE --- */
+#sidebar {
+    width: var(--sidebar-width);
+    min-width: var(--sidebar-width);
+    height: 100vh;
+    background-color: var(--dark-bg);
+    transition: var(--sidebar-transition);
+    display: flex;
+    flex-direction: column;
+    z-index: 1000;
+}
+
+/* LOGIKA COLLAPSED: Dieksekusi via class di tag HTML */
+.sidebar-collapsed #sidebar {
+    width: var(--sidebar-collapsed-width);
+    min-width: var(--sidebar-collapsed-width);
+}
+
+/* Menghilangkan Teks & Header secara instan saat Ciut */
+.sidebar-collapsed #sidebar .header-text,
+.sidebar-collapsed #sidebar .nav-link span,
+.sidebar-collapsed #sidebar .menu-label {
+    opacity: 0;
+    visibility: hidden;
+    display: none;
+}
+
+/* SIDEBAR HEADER */
+.sidebar-header {
+    height: 65px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+/* NAV LINKS (Modern Icon Center) */
+#sidebar .nav-link {
+    display: flex;
+    align-items: center;
+    padding: 12px 22px;
+    color: #a2a3b7;
+    text-decoration: none;
+    transition: background 0.2s, color 0.2s;
+    white-space: nowrap;
+}
+
+#sidebar .nav-link i {
+    font-size: 1.3rem;
+    min-width: 26px;
+    text-align: center;
+}
+
+#sidebar .nav-link span {
+    margin-left: 15px;
+    font-size: 0.95rem;
+}
+
+#sidebar .nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+    color: #fff;
+}
+
+#sidebar .nav-link.active {
+    background-color: var(--primary-blue) !important;
+    color: #fff !important;
+}
+
+/* --- MAIN CONTENT & NAVBAR --- */
+.main-content {
+    flex: 1;
+    height: 100vh;
+    overflow-y: auto;
+    background-color: var(--light-bg);
+    display: flex;
+    flex-direction: column;
+}
+
+.navbar {
+    background-color: #fff;
+    border-bottom: 1px solid #dee2e6;
+    height: 65px;
+}
+
+/* --- LOGIKA TABEL ENTERPRISE --- */
+
+/* Update: Nama Barang tampil utuh tanpa potongan (Enterprise Standard) */
+.text-wrap-pabrik {
+    width: 100%;
+    min-width: 300px;           /* Menjamin kolom punya ruang minimal */
+    white-space: normal;        /* KUNCI: Membolehkan teks turun ke baris baru */
+    word-wrap: break-word;      /* Memotong kata yang terlalu panjang agar tidak merusak tabel */
+    overflow: visible;          /* Memastikan tidak ada teks yang tersembunyi */
+    line-height: 1.5;           /* Jarak antar baris agar nyaman dibaca jika teks panjang */
+    font-size: 0.85rem;
+    color: #333;
+    padding: 5px 0;             /* Memberi sedikit ruang atas-bawah */
+}
+
+/* Meratakan angka ke kanan (Khusus QTY, Nominal, Harga) */
+.text-number {
+    text-align: right;
+    font-family: 'Consolas', 'Monaco', monospace;
+}
+
+/* Gaya tabel preview agar lebih padat & profesional */
+.table-preview {
+    background-color: #fff;
+    font-size: 0.85rem;
+}
+
+.table-preview thead th {
+    background-color: #f8f9fa;
+    border-bottom: 2px solid #dee2e6;
+    color: #444;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
+}
+
+/* --- UTILITIES --- */
+.btn-pink { background-color: #ff69b4; color: white; border: none; }
+.btn-pink:hover { background-color: #ff1493; color: white; }
+
+/* Menghilangkan elemen saat Print */
+@media print {
+    .no-print { display: none !important; }
+}

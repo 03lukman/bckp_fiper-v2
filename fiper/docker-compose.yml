@@ -1,0 +1,18 @@
+services:
+  fina-app:
+    build: .
+    restart: unless-stopped
+    environment:
+      - TZ=Asia/Jakarta
+      - FLASK_ENV=development  # Tells Flask to enable debug features
+      - FLASK_DEBUG=1          # Explicitly turns on the reloader
+    ports:
+      - "5000:5000"
+    networks:
+      - net-caddy
+    volumes:
+      - ./app:/app
+
+networks:
+  net-caddy:
+    external: true

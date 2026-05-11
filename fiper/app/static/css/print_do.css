@@ -1,0 +1,87 @@
+/* ==========================================================================
+   LOGIKA PRINT PROFESIONAL (KHUSUS KERTAS A5) - INK SAVER MODE
+   ========================================================================== */
+@media print {
+    @page {
+        size: A5 landscape;
+        margin: 0.3cm 0.5cm;
+    }
+
+    /* 1. Reset UI */
+    .no-print, #sidebar, .navbar, .card, .btn-group, h3, .navbar-text, hr { 
+        display: none !important; 
+    }
+
+    #main-wrapper, .main-content { 
+        display: block !important;
+        margin: 0 !important; 
+        padding: 0 !important; 
+        width: 100% !important;
+        overflow: visible !important;
+    }
+
+    body { 
+        background-color: white !important; 
+        -webkit-print-color-adjust: exact !important; 
+        print-color-adjust: exact !important;
+    }
+
+    .print-header-info { 
+        display: block !important; 
+        margin-bottom: 10px; 
+    }
+
+    /* 2. Struktur Tabel */
+    table { 
+        width: 100% !important; 
+        border-collapse: collapse !important; 
+        table-layout: fixed !important; 
+        border: 1.2pt solid black !important;
+    }
+    
+    th, td { 
+        border: 1pt solid black !important; 
+        font-size: 7.5pt !important;
+        padding: 2px 3px !important; 
+        color: black !important;
+        word-wrap: break-word !important; 
+        word-break: break-word !important;
+        white-space: normal !important; 
+        vertical-align: top !important; 
+        overflow: visible !important;
+        height: auto !important;
+    }
+
+    /* 3. Definisi Lebar Kolom A5 (Total 100%) */
+    .w-qty     { width: 7% !important; text-align: right !important; } /* QTY RATA KANAN DI KERTAS */
+    .w-packing { width: 12% !important; }
+    .w-kode    { width: 11% !important; text-align: center !important; }
+    .w-nama    { width: 32% !important; }
+    .w-so      { width: 10% !important; text-align: center !important; }
+    .w-cust    { width: 14% !important; }
+    .w-sj      { width: 14% !important; text-align: center !important; }
+
+    /* 4. Reset Elemen Khusus */
+    .text-wrap-pabrik {
+        display: block !important;
+        width: 100% !important;
+        max-height: none !important;
+        min-width: 0 !important;
+        overflow: visible !important;
+        -webkit-line-clamp: unset !important;
+        line-height: 1.1 !important;
+        font-size: 7pt !important;
+    }
+
+    /* 5. Header: Putih Bersih */
+    thead tr th {
+        background-color: #FFFFFF !important; 
+        color: white !important;
+        border: 1.2pt solid black !important;
+        font-weight: bold !important;
+        text-align: center !important;
+    }
+
+    thead { display: table-header-group !important; }
+    .hide-row-print { display: none !important; }
+}

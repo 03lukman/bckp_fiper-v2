@@ -1,0 +1,94 @@
+{% extends "layout/base.html" %}
+
+{% block title %}Preview Piutang - {{ db }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .table-responsive { max-height: 65vh; overflow-y: auto; background: white; border-radius: 8px; }
+    thead { position: sticky; top: 0; z-index: 10; }
+    .table { font-size: 0.9rem; }
+    th, td { white-space: nowrap; vertical-align: middle; }
+    .bg-piutang { background-color: #198754; color: white; } /* Hijau khas Piutang/Finance */
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-piutang d-flex justify-content-between align-items-center">
+            <h5 class="mb-0"><i class="bi bi-wallet2"></i> Preview Piutang AR - Database: {{ db }}</h5>
+            <div class="btn-group">
+                <button onclick="downloadSelected()" class="btn btn-light btn-sm fw-bold">
+                    <i class="bi bi-download"></i> Download Terpilih
+                </button>
+                <a href="{{ url_for('dashboard.index') }}" class="btn btn-outline-light btn-sm ms-2">Kembali</a>
+            </div>
+        </div>
+
+        <div class="card-body bg-light border-bottom">
+            <div class="row g-2">
+                <div class="col-md-4">
+                    <input type="text" id="searchGeneral" onkeyup="filterData()" class="form-control form-control-sm" placeholder="Cari No. Invoice atau Customer...">
+                </div>
+                <div class="col-md-3">
+                    <input type="date" id="dateStart" onchange="filterData()" class="form-control form-control-sm">
+                </div>
+                <div class="col-md-3">
+                    <input type="date" id="dateEnd" onchange="filterData()" class="form-control form-control-sm">
+                </div>
+            </div>
+        </div>
+
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-sm table-bordered table-hover mb-0" id="piutangTable">
+                    <thead class="table-dark">
+                        <tr>
+                            <th class="text-center" style="width: 40px;">
+                                <input type="checkbox" onclick="toggleAll(this)" class="form-check-input">
+                            </th>
+                            <th>Tanggal</th>
+                            <th>No. Invoice</th>
+                            <th>Nama Customer</th>
+                            <th>Term</th>
+                            <th>Nominal Invoice</th>
+                            <th>Jatuh Tempo</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in data %}
+                        <tr>
+                            <td class="text-center">
+                                <input type="checkbox" class="row-check form-check-input">
+                            </td>
+                            <td class="cell-tanggal">{{ row.TANGGAL }}</td>
+                            <td>{{ row.NO_INVOICE }}</td>
+                            <td>{{ row.NAMA_CUSTOMER }}</td>
+                            <td class="text-center">{{ row.TERM_PAYMENT }}</td>
+                            <td class="text-end fw-bold">{{ row.NOMINAL_INV }}</td>
+                            <td class="cell-tanggal">{{ row.JATUH_TEMPO }}</td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="7" class="text-center py-4 text-muted">Data piutang tidak ditemukan.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<form id="downloadForm" action="{{ url_for('documents.download_piutang') }}" method="POST" style="display:none;">
+    <input type="hidden" name="db" value="{{ db }}">
+    <input type="hidden" name="selected_rows" id="selectedRowsInput">
+</form>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const CURRENT_DB = "{{ db }}";
+</script>
+<script src="{{ url_for('static', filename='js/documents.js') }}"></script>
+{% endblock %}
