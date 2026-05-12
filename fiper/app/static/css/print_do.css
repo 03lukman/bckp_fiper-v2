@@ -4,7 +4,7 @@
 @media print {
     @page {
         size: A5 landscape;
-        margin: 0.3cm 0.5cm;
+        margin: 0.5cm;
     }
 
     /* 1. Reset UI */
@@ -38,11 +38,12 @@
         table-layout: fixed !important; 
         border: 1.2pt solid black !important;
     }
-    
+
+    /* Settingan ukuran margin text dan font size selain nama barang */
     th, td { 
         border: 1pt solid black !important; 
         font-size: 7.5pt !important;
-        padding: 2px 3px !important; 
+        padding: 3px 2px !important; 
         color: black !important;
         word-wrap: break-word !important; 
         word-break: break-word !important;
@@ -54,14 +55,21 @@
 
     /* 3. Definisi Lebar Kolom A5 (Total 100%) */
     .w-qty     { width: 7% !important; text-align: right !important; } /* QTY RATA KANAN DI KERTAS */
+<<<<<<< HEAD
     .w-packing { width: 12% !important; }
     .w-kode    { width: 11% !important; text-align: center !important; }
+    .w-nama    { width: 30% !important; }
+    .w-so      { width: 12% !important; text-align: center !important; }
+=======
+    .w-packing { width: 13% !important; }
+    .w-kode    { width: 10% !important; text-align: center !important; }
     .w-nama    { width: 32% !important; }
     .w-so      { width: 10% !important; text-align: center !important; }
+>>>>>>> f35217fcebead66f9539382fcf75b54d76f9a640
     .w-cust    { width: 14% !important; }
-    .w-sj      { width: 14% !important; text-align: center !important; }
+    .w-sj      { width: 12% !important; text-align: center !important; }
 
-    /* 4. Reset Elemen Khusus */
+    /* 4. Reset Elemen Khusus NAMA BARANG */
     .text-wrap-pabrik {
         display: block !important;
         width: 100% !important;
@@ -70,7 +78,7 @@
         overflow: visible !important;
         -webkit-line-clamp: unset !important;
         line-height: 1.1 !important;
-        font-size: 7pt !important;
+        font-size: 7.5pt !important;
     }
 
     /* 5. Header: Putih Bersih */
