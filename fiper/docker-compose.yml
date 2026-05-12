@@ -4,15 +4,17 @@ services:
     restart: unless-stopped
     environment:
       - TZ=Asia/Jakarta
-      - FLASK_ENV=development  # Tells Flask to enable debug features
-      - FLASK_DEBUG=1          # Explicitly turns on the reloader
+      - FLASK_APP=run.py  
+      - FLASK_ENV=development
+      - FLASK_DEBUG=1
     ports:
       - "5000:5000"
     networks:
       - net-caddy
     volumes:
-      - ./app:/app
+      - .:/app # Agar perubahan di lokal langsung terbaca container
 
 networks:
   net-caddy:
     external: true
+
