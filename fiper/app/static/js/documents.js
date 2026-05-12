@@ -37,35 +37,42 @@ function showToast(message, type = 'success') {
 
 // 1. Fungsi Filter Universal (Mendukung pencarian teks dan rentang tanggal)
 function filterData() {
-    const start = document.getElementById("dateStart")?.value;
-    const end = document.getElementById("dateEnd")?.value;
-    const searchInput = document.getElementById("searchSO") || document.getElementById("searchGeneral");
-    const searchText = searchInput ? searchInput.value.toUpperCase() : "";
-    
-    const rows = document.querySelectorAll("table tbody tr");
+    // Ambil input dari filter
+    const valSO = document.getElementById('searchSO').value.toLowerCase();
+    const valBarang = document.getElementById('searchBarang').value.toLowerCase();
+    const dateStart = document.getElementById('dateStart').value;
+    const dateEnd = document.getElementById('dateEnd').value;
 
-    rows.forEach(row => {
-        const dateCell = row.querySelector(".cell-tanggal")?.innerText;
-        const textCell = row.innerText.toUpperCase(); 
+    const table = document.getElementById("soTable");
+    const tr = table.getElementsByTagName("tr");
+
+    // Loop semua baris (lewati header index 0)
+    for (let i = 1; i < tr.length; i++) {
+        let showRow = true;
+        const row = tr[i];
         
-        let matchDate = true;
-        if (dateCell && (start || end)) {
-            const parts = dateCell.split('/');
-            const rowDate = `${parts[2]}-${parts[1]}-${parts[0]}`;
-            if (start && rowDate < start) matchDate = false;
-            if (end && rowDate > end) matchDate = false;
+        // Lewati jika baris "Data tidak ditemukan"
+        if (row.cells.length < 2) continue;
+
+        // Ambil teks dari kolom spesifik
+        const txtSO = row.cells[1].textContent.toLowerCase();     // Kolom No. SO
+        const txtBarang = row.cells[4].textContent.toLowerCase(); // Kolom Nama Barang
+        const txtTanggal = row.cells[2].textContent;              // Kolom Tgl SO
+
+        // Logika Filter Teks per Kolom
+        if (valSO && !txtSO.includes(valSO)) showRow = false;
+        if (valBarang && !txtBarang.includes(valBarang)) showRow = false;
+
+        // Logika Filter Tanggal (jika diisi)
+        if (dateStart || dateEnd) {
+            const rowDate = new Date(txtTanggal);
+            if (dateStart && rowDate < new Date(dateStart)) showRow = false;
+            if (dateEnd && rowDate > new Date(dateEnd)) showRow = false;
         }
 
-        let matchSearch = textCell.includes(searchText);
-
-        if (matchDate && matchSearch) {
-            row.style.display = "";
-        } else {
-            row.style.display = "none";
-            const cb = row.querySelector('.row-check');
-            if (cb) cb.checked = false;
-        }
-    });
+        // Tampilkan atau sembunyikan baris
+        row.style.display = showRow ? "" : "none";
+    }
 }
 
 // 2. Centang Semua (Hanya baris yang sedang tampil/filtered)
