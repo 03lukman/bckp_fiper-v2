@@ -34,14 +34,14 @@
 
         <div class="card-body bg-light border-bottom">
             <div class="row g-2">
-                <div class="col-md-4">
-                    <input type="text" id="searchGeneral" onkeyup="filterData()" class="form-control form-control-sm" placeholder="Cari No. SJ, Invoice, atau Customer...">
+                <div class="col-md-2">
+                     <input type="date" id="dateEnd" onchange="filterData()" class="form-control form-control-sm">
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <input type="date" id="dateStart" onchange="filterData()" class="form-control form-control-sm">
                 </div>
                 <div class="col-md-3">
-                    <input type="date" id="dateEnd" onchange="filterData()" class="form-control form-control-sm">
+                    <input type="text" id="searchGeneral" onkeyup="filterData()" class="form-control form-control-sm" placeholder="Cari No. SJ, Invoice, atau Customer...">
                 </div>
             </div>
         </div>
