@@ -17,4 +17,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 EXPOSE 5000
 
 # 5. Jalankan aplikasi
-CMD ["python", "piutang.py"]
+CMD ["python", "run.py"]
